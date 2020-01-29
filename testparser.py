@@ -65,9 +65,10 @@ if __name__ == '__main__':
         try:
             # The main directory (label_data) has no subdir and will throw an exception when trying to index after
             # the split. This is fine since we want to skip it anyways
-            planet_name = subdir.split('\\')[1]
+            planet_name = subdir.split('/')[1]
             planet = Planet(planet_name)
             for file in files:
+                file.encode("utf-8")
                 # add each file within a planets directory as a dataset
                 planet.add_dataset(os.path.join(subdir, file))
                 # print(os.path.join(subdir, file))
@@ -76,9 +77,9 @@ if __name__ == '__main__':
             continue
 
     # Test prints
-    print(planet_array[0])
-    print(planet_array[0].data_array[0].epoch_array[0])
-    print(planet_array[0].data_array[0].depth_array[0])
-    print(planet_array[0].data_array[0].error_array[0])
-    print(planet_array[0].data_array[0].data_quality)
+    print("Planet Name: ", planet_array[0])
+    print("Epoch Time: ", planet_array[0].data_array[0].epoch_array[0])
+    print("Depth of Transit: ", planet_array[0].data_array[0].depth_array[0])
+    print("Error/Other-Data: ", planet_array[0].data_array[0].error_array[0])
+    print("Data Quality: ", planet_array[0].data_array[0].data_quality)
 

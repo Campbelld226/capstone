@@ -1,6 +1,6 @@
-FOTOMETRÍA RELATIVA
+FOTOMETRA RELATIVA
 
-HAT-P-23B 
+HAT-P-23B
 FECHA J HELIO         MAG      +/-    RSR  AIRMS  TRANS
 -----------------------------------------  -----  -----
 2458676.41760     -0.0046   0.0085    128  1.461   1.10

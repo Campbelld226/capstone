@@ -1,6 +1,6 @@
-FOTOMETRÍA RELATIVA
+FOTOMETRA RELATIVA
 
-VAR-1 
+VAR-1
 FECHA J HELIO         MAG      +/-
 ----------------------------------
 2458009.31579    -0.01133  0.01151

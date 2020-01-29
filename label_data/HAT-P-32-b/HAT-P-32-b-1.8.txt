@@ -1,6 +1,6 @@
-FOTOMETRÍA RELATIVA
+FOTOMETRA RELATIVA
 
-HAT-P-32B 
+HAT-P-32B
 FECHA J HELIO         MAG      +/-
 ----------------------------------
 2458088.26233     -0.0120   0.0043

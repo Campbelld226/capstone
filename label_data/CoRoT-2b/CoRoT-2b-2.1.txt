@@ -1,6 +1,6 @@
-FOTOMETRÍA RELATIVA
+FOTOMETRA RELATIVA
 
-COROT 2B 
+COROT 2B
 FECHA J HELIO         MAG      +/-    RSR  AIRMS  TRANS
 -----------------------------------------  -----  -----
 2458680.37003      0.0022   0.0090    120  1.861   0.99

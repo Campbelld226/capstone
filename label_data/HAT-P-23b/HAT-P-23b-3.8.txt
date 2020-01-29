@@ -1,6 +1,6 @@
-FOTOMETRÍA RELATIVA
+FOTOMETRA RELATIVA
 
-HAT 23 B 
+HAT 23 B
 FECHA J HELIO         MAG      +/-    RSR  AIRMS  TRANS  FWHM"   FONDO
 -----------------------------------------  -----  -----  -----  ------
 2458077.25848      -0.012    0.009    124  1.208   1.10   7.31    0.43

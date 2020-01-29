@@ -1,6 +1,6 @@
-FOTOMETRÍA RELATIVA
+FOTOMETRA RELATIVA
 
-COROT-2 B 
+COROT-2 B
 FECHA J HELIO         MAG      +/-
 ----------------------------------
 2456869.41958      -0.018    0.005
@@ -140,5 +140,5 @@ FECHA J HELIO         MAG      +/-
 2456869.51930      -0.033    0.005
 2456869.52002      -0.041    0.005
 
-Observador: Francisco José Fernández Gómez
+Observador: Francisco Josï¿½ Fernï¿½ndez Gï¿½mez
 FotoDif 3.93
