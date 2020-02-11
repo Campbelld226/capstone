@@ -1,14 +1,16 @@
 import sys
 import os
 import re
-import matplotlib.pyplot as plt
-from scipy.interpolate import UnivariateSpline
-
+import numpy as np
+from scipy.signal import savgol_filter
+from matplotlib import pyplot as plt
 # TODO: We should compile a list of questions for our meeting with Cartledge about what he expects from this program. \
 #  - Does he just want command line prompts or a basic GUI?                                                           \
 #  - What does he expect his input to look like?                                                                      \
 #  - What does he expect the output to be?                                                                            \
-#  -
+#  - Does he have a filter system for signals already?
+
+# TODO: Fix encoding issues in files. (need utf-8)
 
 
 class Planet:
@@ -29,13 +31,18 @@ class Planet:
 
 class Dataset:
     def __init__(self):
+        self.name = None
         self.data_quality = None
         self.epoch_array = []
         self.depth_array = []
         self.error_array = []
 
+    def __repr__(self):
+        return str(self.name)
+
     # Parses a data file and populates the Dataset class attributes
     def parse_data(self, filename):
+        self.name = filename
         # TODO: Figure out how to make pycharm ignore specific style issues. It feels the escaping of these periods \
         #  is a style issue and I want it to ignore this specific case but not any other styling issues.
         # Gets the data quality from the filename
@@ -55,7 +62,7 @@ class Dataset:
             except ValueError:
                 epoch, depth = line.split()
                 error = None
-            self.epoch_array.append(float(epoch))
+            self.epoch_array.append(epoch)
             self.depth_array.append(depth)
             self.error_array.append(error)
 
@@ -78,19 +85,17 @@ if __name__ == '__main__':
             planet_array.append(planet)
         except IndexError:
             continue
-    x = planet_array[0].data_array[0].epoch_array
-    y = planet_array[0].data_array[0].depth_array
-    s = UnivariateSpline(x, y, s=1)
-    xs = planet_array[0].data_array[0].epoch_array
-    ys = s(xs)
-    plt.plot(x, y)
-    plt.plot(xs, ys)
-    plt.show()
 
     # Test prints
-    print("Planet Name: ", planet_array[0])
+    print("Planet Name: ", planet_array[0].data_array[0])
     print("Epoch Time: ", planet_array[0].data_array[0].epoch_array[0])
     print("Depth of Transit: ", planet_array[0].data_array[0].depth_array[0])
     print("Error/Other-Data: ", planet_array[0].data_array[0].error_array[0])
     print("Data Quality: ", planet_array[0].data_array[0].data_quality)
 
+    smooth_x = savgol_filter(planet_array[0].data_array[0].epoch_array, 61, 2)
+    smooth_y = savgol_filter(planet_array[0].data_array[0].depth_array, 61, 2)
+    #plt.plot(planet_array[0].data_array[0].epoch_array, planet_array[0].data_array[0].depth_array)
+    #plt.plot(planet_array[0].data_array[0].epoch_array, smooth_y, 'o')
+    plt.plot(smooth_x, smooth_y, "o")
+    plt.show() 
