@@ -1,6 +1,9 @@
 import sys
 import os
 import re
+import matplotlib.pyplot as plt
+from scipy.interpolate import UnivariateSpline
+
 # TODO: We should compile a list of questions for our meeting with Cartledge about what he expects from this program. \
 #  - Does he just want command line prompts or a basic GUI?                                                           \
 #  - What does he expect his input to look like?                                                                      \
@@ -52,7 +55,7 @@ class Dataset:
             except ValueError:
                 epoch, depth = line.split()
                 error = None
-            self.epoch_array.append(epoch)
+            self.epoch_array.append(float(epoch))
             self.depth_array.append(depth)
             self.error_array.append(error)
 
@@ -75,6 +78,14 @@ if __name__ == '__main__':
             planet_array.append(planet)
         except IndexError:
             continue
+    x = planet_array[0].data_array[0].epoch_array
+    y = planet_array[0].data_array[0].depth_array
+    s = UnivariateSpline(x, y, s=1)
+    xs = planet_array[0].data_array[0].epoch_array
+    ys = s(xs)
+    plt.plot(x, y)
+    plt.plot(xs, ys)
+    plt.show()
 
     # Test prints
     print("Planet Name: ", planet_array[0])
