@@ -3,7 +3,10 @@ import os
 import re
 import numpy as np
 from scipy.signal import savgol_filter
+from scipy.signal import gauss_spline
 from matplotlib import pyplot as plt
+from scipy.interpolate import UnivariateSpline
+from scipy.interpolate import interp1d
 # TODO: We should compile a list of questions for our meeting with Cartledge about what he expects from this program. \
 #  - Does he just want command line prompts or a basic GUI?                                                           \
 #  - What does he expect his input to look like?                                                                      \
@@ -62,8 +65,9 @@ class Dataset:
             except ValueError:
                 epoch, depth = line.split()
                 error = None
+            epoch = float(epoch) - int(float(epoch))
             self.epoch_array.append(epoch)
-            self.depth_array.append(depth)
+            self.depth_array.append(float(depth))
             self.error_array.append(error)
 
 
@@ -71,7 +75,7 @@ class Dataset:
 if __name__ == '__main__':
     planet_array = []
     # Iterate through each file in label_data
-    for subdir, dirs, files in os.walk('label_data'):
+    for subdir, dirs, files in os.walk('test'):
         try:
             # The main directory (label_data) has no subdir and will throw an exception when trying to index after
             # the split. This is fine since we want to skip it anyways
@@ -87,15 +91,37 @@ if __name__ == '__main__':
             continue
 
     # Test prints
-    print("Planet Name: ", planet_array[0].data_array[0])
-    print("Epoch Time: ", planet_array[0].data_array[0].epoch_array[0])
-    print("Depth of Transit: ", planet_array[0].data_array[0].depth_array[0])
-    print("Error/Other-Data: ", planet_array[0].data_array[0].error_array[0])
+    print("Planet Name: ", planet_array[0])
+    print("File: ", planet_array[0].data_array[0])
+    print("Epoch Time[0]: ", planet_array[0].data_array[0].epoch_array[0])
+    print("Depth of Transit[0]: ", planet_array[0].data_array[0].depth_array[0])
+    print("Error/Other-Data[0]: ", planet_array[0].data_array[0].error_array[0])
     print("Data Quality: ", planet_array[0].data_array[0].data_quality)
 
-    smooth_x = savgol_filter(planet_array[0].data_array[0].epoch_array, 61, 2)
-    smooth_y = savgol_filter(planet_array[0].data_array[0].depth_array, 61, 2)
-    #plt.plot(planet_array[0].data_array[0].epoch_array, planet_array[0].data_array[0].depth_array)
-    #plt.plot(planet_array[0].data_array[0].epoch_array, smooth_y, 'o')
+    # Raw data
+    x = planet_array[0].data_array[0].epoch_array
+    y = planet_array[0].data_array[0].depth_array
+    plt.plot(x, y, 'o')
+
+    # Savgol filter
+    smooth_x = savgol_filter(x, 37, 2)
+    smooth_y = savgol_filter(y, 37, 2)
     plt.plot(smooth_x, smooth_y, "o")
-    plt.show() 
+
+    # Univariate spline
+    # TODO: Splines are not it
+    s = UnivariateSpline(smooth_x, smooth_y, s=1)
+    ys = s(smooth_x)
+    plt.plot(smooth_x, ys)
+
+    # Interpolation
+    fs = interp1d(smooth_x, smooth_y, kind='cubic', fill_value='extrapolate')
+    plt.plot(x, fs(x), '-')
+
+    # TODO: Dynamically set the y limits based on the data
+    # Set the y limits to get the proper shape
+    plt.ylim(-0.41, -0.55)
+    #plt.ylim(-1.2, -1.3)
+    plt.xlabel("Epoch")
+    plt.ylabel("Depth")
+    plt.show()
