@@ -70,7 +70,12 @@ class Dataset:
             self.depth_array.append(float(depth))
             self.error_array.append(error)
 
+def adjust_boundaries(min, max, percent):
 
+    min -= (min*percent)
+    max += (max*percent)
+
+    return min, max
 # TODO: Begin trying different SciPy things on this data and seeing what comes out
 if __name__ == '__main__':
     planet_array = []
@@ -101,6 +106,12 @@ if __name__ == '__main__':
     # Raw data
     x = planet_array[0].data_array[0].epoch_array
     y = planet_array[0].data_array[0].depth_array
+
+    minimum = np.amin(planet_array[0].data_array[0].depth_array).item()
+    maximum = np.amax(planet_array[0].data_array[0].depth_array).item()
+    print(minimum, maximum)
+    minimum, maximum = adjust_boundaries(minimum, maximum, 0.3)
+    print(minimum, maximum)
     plt.plot(x, y, 'o')
 
     # Savgol filter
@@ -120,7 +131,7 @@ if __name__ == '__main__':
 
     # TODO: Dynamically set the y limits based on the data
     # Set the y limits to get the proper shape
-    plt.ylim(-0.41, -0.55)
+    plt.ylim(minimum, maximum)
     #plt.ylim(-1.2, -1.3)
     plt.xlabel("Epoch")
     plt.ylabel("Depth")
