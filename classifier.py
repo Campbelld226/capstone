@@ -6,8 +6,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# TODO: Label some of our data
+#  [start_of_transit end_of_transit max_depth baseline]
 
-
+# TODO: Use our real data
 iris = datasets.load_iris()
 
 #Two dimensional data in the format columns:rows
@@ -46,6 +48,7 @@ print(feature_imp)
 print("Transit Predicitions: ", Y_pred, "\n[0]:Transit\n[1]:No Transit\n[2]:Unsure")
 print("Accuracy:",metrics.accuracy_score(Y_test, Y_pred))
 
+# TODO: Why isn't this working?
 #exec(%matplotlib inline)
 
 sns.barplot(x=feature_imp, y=feature_imp.index)
