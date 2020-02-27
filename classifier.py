@@ -5,9 +5,12 @@ from sklearn import metrics
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+
+
 iris = datasets.load_iris()
 
-
+#Two dimensional data in the format columns:rows
 data=pd.DataFrame({
     'Transit Depth':iris.data[:,0],
     'Transit Length':iris.data[:,1],
@@ -16,14 +19,15 @@ data=pd.DataFrame({
     'Transits':iris.target
 })
 
-data.head()
-
+print(iris.data)
+#X and Y components for our classifier, X being the features, Y being the labels
 X = data[['Transit Depth', 'Transit Length', 'Depth Derivative', 'Second Derivative Depth']]
 Y = data['Transits']
 
+#Splitting the data into testing and training data, giving our program 70% training data and 30% testing data
 X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size=0.3)
 
-
+#
 clf = RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
             max_depth=None, max_features='auto', max_leaf_nodes=None,
             min_impurity_decrease=0.0, min_impurity_split=None,
@@ -32,13 +36,17 @@ clf = RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini'
             oob_score=False, random_state=None, verbose=0,
             warm_start=False)
 
-
+#fitting the classifier to our data, and extracting the feature importance.
 clf.fit(X_train, Y_train)
 feature_imp = pd.Series(clf.feature_importances_,index=['Transit Depth', 'Transit Length', 'Depth Derivative', 'Second Derivative Depth']).sort_values(ascending=False)
-print(feature_imp)
-print("Transit Predicition: ", clf.predict([[3,5,4,2]]), "\n[1]:Transit\n[2]:No Transit\n[3]:Unsure")
+Y_pred = clf.predict(X_test)
 
-'exec(%matplotlib inline)'
+
+print(feature_imp)
+print("Transit Predicitions: ", Y_pred, "\n[0]:Transit\n[1]:No Transit\n[2]:Unsure")
+print("Accuracy:",metrics.accuracy_score(Y_test, Y_pred))
+
+#exec(%matplotlib inline)
 
 sns.barplot(x=feature_imp, y=feature_imp.index)
 
