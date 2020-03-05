@@ -1,9 +1,1 @@
-
-HAT-P-23b-3.13
-Start transit point 2456491.805	-1.243	0.002
-End transit point 2456491.888	-1.246	0.002
-max depth point 2456491.849	-1.206	0.002
-baseline depth -1.244
-Start measurement point 2456491.783	-1.248	0.002
-End measurement point 2456491.917	-1.246	0.002
-
+epoch depth error transit

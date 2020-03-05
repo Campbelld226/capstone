@@ -87,20 +87,27 @@ def adjust_boundaries(min, max, percent):
 if __name__ == '__main__':
     planet_array = []
     # Iterate through each file in transit_data
-    for subdir, dirs, files in os.walk('transit_data'):
-        try:
-            # The main directory (transit_data) has no subdir and will throw an exception when trying to index after
-            # the split. This is fine since we want to skip it anyways
-            planet_name = subdir.split('/')[1]
-            planet = Planet(planet_name)
-            for file in files:
-                file.encode("utf-8")
-                # add each file within a planets directory as a dataset
-                planet.add_dataset(os.path.join(subdir, file))
-                # print(os.path.join(subdir, file))
-            planet_array.append(planet)
-        except IndexError:
-            continue
+    # for subdir, dirs, files in os.walk('transit_data'):
+    #     try:
+    #         # The main directory (transit_data) has no subdir and will throw an exception when trying to index after
+    #         # the split. This is fine since we want to skip it anyways
+    #         planet_name = subdir.split('/')[1]
+    #         planet = Planet(planet_name)
+    #         for file in files:
+    #             file.encode("utf-8")
+    #             # add each file within a planets directory as a dataset
+    #             planet.add_dataset(os.path.join(subdir, file))
+    #             # print(os.path.join(subdir, file))
+    #         planet_array.append(planet)
+    #     except IndexError:
+    #         continue
+
+    directory = sys.argv[1]
+    planet_name = directory.split('/')[2].split('_')[0]
+    print(planet_name, directory)
+    planet = Planet(planet_name)
+    planet.add_dataset(directory)
+    planet_array.append(planet)
 
     # Test prints
     print("Planet Name: ", planet_array[0])
@@ -117,9 +124,11 @@ if __name__ == '__main__':
     minimum = np.amin(planet_array[0].data_array[0].depth_array).item()
     maximum = np.amax(planet_array[0].data_array[0].depth_array).item()
     print(minimum, maximum)
-    minimum, maximum = adjust_boundaries(minimum, maximum, 0.10)
+    # minimum, maximum = adjust_boundaries(minimum, maximum, 0.05)
+    minimum, maximum = adjust_boundaries(-2, 2, 0.05)
     print(minimum, maximum)
     plt.plot(x, y, 'o')
+    # print(planet_array[0].data_array[0].epoch_array)
 
     # Savgol filter
     smooth_x = savgol_filter(x, 37, 2)

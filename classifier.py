@@ -7,10 +7,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # TODO: Label some of our data
-#  [start_of_transit end_of_transit max_depth baseline]
+#  [start_of_transit end_of_transit max_depth baseline start_time end_time]
+#  [part_of_transit derivative_of_point peak tangent ]
 
 # TODO: Use our real data
 iris = datasets.load_iris()
+# print(iris)
 
 #Two dimensional data in the format columns:rows
 data=pd.DataFrame({
