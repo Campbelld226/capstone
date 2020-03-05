@@ -10,21 +10,25 @@ import seaborn as sns
 
 # TODO: What other features should we be using?
 #  - Derivatives?
-# TODO: Label more data
-# TODO: Make the learning persistent so we don't need to train each time
-#  - Use pickling
-# TODO: Train on a lot more data
-# TODO: Figure out a good graphical representation of the predicted data
-#  - Can we graph the raw points and maybe plot the predicted transit over top?
-# TODO: Figure out a good way to show the light curve graphs so they're not upside down
-#  - All depth values get larger as the transit occurs, but some are negative and some
-#       are positive, making some graphs go upside down. Learn matplotlib better
-# TODO: Clean the git repository
-#  - There are many branches on branches on branches. Time to merge and clean up
 # TODO: Create a script to convert files to the proper csv format
 #  - Add the labels at the top
 #  - Remove unnecessary data
 #  - Replace whitespace with commas
+# TODO: Label more data
+# TODO: Make the learning persistent so we don't need to train each time
+#  - Use pickling
+# TODO: Train on a lot more data
+# TODO: Figure out a good way to show the light curve graphs so they're not upside down
+#  - All depth values get larger as the transit occurs, but some are negative and some
+#       are positive, making some graphs go upside down. Learn matplotlib better
+# TODO: Figure out a good graphical representation of the predicted data
+#  - Can we graph the raw points and maybe plot the predicted transit over top?
+# TODO: Try predicting with Cartledge's shitty data
+# TODO: Clean the git repository
+#  - There are many branches on branches on branches. Time to merge and clean up
+# TODO: Build a requirements file for pip
+# TODO: Figure out how to package this all in a convenient way for people to use
+# TODO: Build a GUI if we have time
 
 # iris = datasets.load_iris()
 # print(iris)
