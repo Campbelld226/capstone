@@ -29,6 +29,10 @@ import seaborn as sns
 # TODO: Build a requirements file for pip
 # TODO: Figure out how to package this all in a convenient way for people to use
 # TODO: Build a GUI if we have time
+# gradient, derivative, local avg, covolution, neighbourhood points, peaks, distance from mean of signal, abs min and max
+# fourier transform -> operation -> inverse fourier
+# polynomial features
+# look at the
 
 # iris = datasets.load_iris()
 # print(iris)
@@ -36,6 +40,7 @@ train_data = pd.read_csv('test/CoRoT-2b_1.6.txt')
 print('TRAIN DATA:\n', train_data)
 test_data = pd.read_csv('test/CoRoT-2b_1.7.txt')
 print('TEST DATA:\n', test_data)
+
 # Two dimensional data in the format columns:rows
 # data=pd.DataFrame({
 #     'Transit Depth':iris.data[:,0],
