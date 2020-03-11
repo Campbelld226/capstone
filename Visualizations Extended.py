@@ -7,14 +7,14 @@
 
 
 import pandas as pd
-from Labeller import Labeller
+from Labeler import Labeller
 
 
 # In[2]:
 
 
 
-l = Labeller(pd.read_csv('test/CoRoT-2b_1.7.txt'))
+l = Labeller(pd.read_csv('test/CoRoT-2b_1.7.csv'))
 df = l.get_cluster()
 
 

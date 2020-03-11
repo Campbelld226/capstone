@@ -36,9 +36,9 @@ import seaborn as sns
 
 # iris = datasets.load_iris()
 # print(iris)
-train_data = pd.read_csv('test/CoRoT-2b_1.6.txt')
+train_data = pd.read_csv('test/CoRoT-2b_1.6.csv')
 print('TRAIN DATA:\n', train_data)
-test_data = pd.read_csv('test/CoRoT-2b_1.7.txt')
+test_data = pd.read_csv('test/CoRoT-2b_1.7.csv')
 print('TEST DATA:\n', test_data)
 
 # Two dimensional data in the format columns:rows
