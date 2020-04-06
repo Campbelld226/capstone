@@ -1,9 +1,6 @@
 import pandas as pd
-import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import Normalizer
-from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import AgglomerativeClustering
 
@@ -16,9 +13,8 @@ class Labeler:
 
     def get_cluster(self):
         train_data = self.X
-        # TODO: Convert a bunch of files to the proper format, with no transit value
-        #  Maybe leave error in the files for now and we can filter from here
         train_data = train_data[[x for x in train_data if x not in ['error']]]
+        print(type(train_data))
 
         # Create proportional feature
         train_data['depth_prop'] = train_data['depth'] / train_data['depth'].values[0]
@@ -86,3 +82,8 @@ class Labeler:
 
         plt.show()
         return train_data
+
+
+if __name__ == "__main__":
+    l = Labeler(pd.read_csv('real_data/AdrienneS_comps.csv'))
+    df = l.get_cluster()
