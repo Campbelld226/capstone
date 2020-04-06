@@ -2,11 +2,10 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import Normalizer
-from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import SpectralClustering
+from sklearn.cluster import KMeans
 
 
 class Labeler:
@@ -24,42 +23,67 @@ class Labeler:
         elif val == 2:
             clustering = SpectralClustering(n_clusters=self.n_clusters).fit(X)
 
+        elif val == 3:
+            clustering = KMeans(n_clusters=self.n_clusters).fit(X)
+
         return clustering
 
-    def display(self, mask, X, clustering, train_data):
+    def display(self, mask, X, clustering, cluster_name, train_data):
         # Dropping nans from features
         if clustering.labels_.shape[0] != train_data.shape[0]:
             train_data = train_data.loc[mask]
             clustering.labels_ = clustering.labels_[mask]
             clustering.labels_ = clustering.labels_[mask]
 
-        # Settings Labels as color
-        train_data['labels_int'] = clustering.labels_
-        color_map = {'0': 'red',
-                    '1': 'blue',
-                    '2': 'green',
-                    '3': 'gray',
-                    '4': 'yellow',
-                    '5': 'purple'}
-        train_data['color'] = train_data.apply(lambda x: color_map[str(int(x['labels_int']))], axis=1)
+        color_array = ['red', 'blue', 'green', 'yellow', 'gray']
+        labels_desc_array = ['Pre-Transit', 'Downward Slope', 'Bottom', 'Upward Slope', 'Post-Transit']
+        cluster_dict = {}
+        cluster_num = -1
+        labels_int = []
+        color = []
+        labels_desc = []
+        for index, label in enumerate(clustering.labels_):
+            if label not in cluster_dict.keys():
+                cluster_num = cluster_num + 1
+                cluster_dict[label] = cluster_num
 
-        # Create Readable Labels
-        label_map = {'0': 'Bottom',
-                    '1': 'Upward Slope',
-                    '2': 'Post Transit',
-                    '3': 'Downward Slope',
-                    '4': 'Pre Transit',
-                    '5': 'Other'}
-        train_data['labels_desc'] = train_data.apply(lambda x: label_map[str(int(x['labels_int']))], axis=1)
+            labels_int.append(cluster_dict[label])
+            color.append(color_array[cluster_dict[label]])
+            labels_desc.append(labels_desc_array[cluster_num])
 
-        # TODO: Get better colors to work
-        cmap = plt.get_cmap("magma")
-        cmap = plt.get_cmap("YlOrBr")
+        train_data['labels_int'] = labels_int
+        train_data['labels_desc'] = labels_desc
+        train_data['color'] = color
+
+
+        # # Settings Labels as color
+        # train_data['labels_int'] = clustering.labels_
+        # print(clustering.labels_)
+        # #print(train_data['labels_int'])
+        # #print(train_data['labels_int'])
+        # color_map = {'0': 'red',
+        #             '1': 'blue',
+        #             '2': 'green',
+        #             '3': 'gray',
+        #             '4': 'yellow',
+        #             '5': 'purple'}
+        # train_data['color'] = train_data.apply(lambda x: color_map[str(int(x['labels_int']))], axis=1)
+        #
+        # # Create Readable Labels
+        # label_map = {'0': 'Bottom',
+        #            '1': 'Upward Slope',
+        #            '2': 'Post Transit',
+        #            '3': 'Downward Slope',
+        #           '4': 'Pre Transit',
+        #           '5': 'Other'}
+        # train_data['labels_desc'] = train_data.apply(lambda x: label_map[str(int(x['labels_int']))], axis=1)
+
         sns.scatterplot(x=range(len(train_data['depth'])),
-                        y=train_data['depth'] * -1, hue=train_data['labels_int'])
+                        y=train_data['depth'] * -1, hue=train_data['labels_desc'])
+        plt.title(cluster_name)
 
         plt.show()
-        #return train_data
+        return train_data
 
     def get_data(self):
         train_data = self.X
@@ -99,10 +123,13 @@ class Labeler:
 
         agglom_clustering = self.cluster_method(X, 1)
         spectral_clustering = self.cluster_method(X, 2)
-        self.display(mask, X, agglom_clustering, train_data)
-        self.display(mask, X, spectral_clustering, train_data)
+        k_means = self.cluster_method(X, 3)
+        train_data = self.display(mask, X, agglom_clustering, "Agglomerative Clustering", train_data)
+        train_data = self.display(mask, X, spectral_clustering, "Spectral Clustering", train_data)
+        train_data = self.display(mask, X, k_means, "K-Means Clustering", train_data)
+        return train_data
 
 
-if __name__ == '__main__':
-    l = Labeler(pd.read_csv('test/CoRoT-2b_1.6.csv'))
-    l.get_data()
+# if __name__ == '__main__':
+#     l = Labeler(pd.read_csv('test/CoRoT-2b_1.2.csv'))
+#     l.get_data()
