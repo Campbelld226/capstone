@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from statistics import mean
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import SpectralClustering
@@ -36,7 +37,7 @@ class Labeler:
             clustering.labels_ = clustering.labels_[mask]
 
         color_array = ['red', 'blue', 'green', 'yellow', 'gray']
-        labels_desc_array = ['Pre-Transit', 'Downward Slope', 'Bottom', 'Upward Slope', 'Post-Transit']
+        labels_desc_array = ['Exterior Ingress', 'Interior Ingress', 'Greatest Transit', 'Interior Egress', 'Exterior Egress']
         cluster_dict = {}
         cluster_num = -1
         labels_int = []
@@ -127,9 +128,47 @@ class Labeler:
         train_data = self.display(mask, X, agglom_clustering, "Agglomerative Clustering", train_data)
         train_data = self.display(mask, X, spectral_clustering, "Spectral Clustering", train_data)
         train_data = self.display(mask, X, k_means, "K-Means Clustering", train_data)
+        self.X = train_data
         return train_data
 
+    def average(self):
+        train_data = self.X
+        cluster0 = []
+        cluster1 = [] 
+        cluster2 = []
+        cluster3 = []
+        cluster4 = []
+        total = mean(train_data['depth'])
+        for index, label in enumerate(train_data['depth']):
+            if list(train_data['labels_int'])[index] == 0:
+                cluster0.append(label)
+            elif list(train_data['labels_int'])[index] == 1:
+                cluster1.append(label)
+            elif list(train_data['labels_int'])[index] == 2:
+                cluster2.append(label)
+            elif list(train_data['labels_int'])[index] == 3:
+                cluster3.append(label)
+            elif list(train_data['labels_int'])[index] == 4:
+                cluster4.append(label) 
+        
+        overall_avg = [(mean(cluster0)/total)*100, (mean(cluster1)/total)*100,
+                    (mean(cluster2)/total)*100, (mean(cluster3)/total)*100,
+                    (mean(cluster4)/total)*100]
+        return overall_avg
+        #all_avg.append(total)
 
-# if __name__ == '__main__':
-#     l = Labeler(pd.read_csv('test/CoRoT-2b_1.2.csv'))
-#     l.get_data()
+
+
+
+
+
+
+
+if __name__ == '__main__':
+    l = Labeler(pd.read_csv('test/CoRoT-2b_1.2.csv'))
+    l.get_data()
+    print("Transit: ", l.average())
+    
+    l2 = Labeler(pd.read_csv('test/no_transit.csv'))
+    l2.get_data()
+    print("No Transit: ", l2.average())
