@@ -129,7 +129,45 @@ class Labeler:
                     (mean(cluster2)/total)*100, (mean(cluster3)/total)*100,
                     (mean(cluster4)/total)*100]
         return overall_avg
-        #all_avg.append(total)
+        
+    def confidence(self, average_array):
+        confidence_values = []
+        conf_one = abs(average_array[1] - average_array[0])
+        conf_two = abs(average_array[3] - average_array[4])
+        for i in range(len(average_array)):
+            if(average_array[i] <= 95 or average_array[i] >= 105):
+                confidence_values.append(1)
+            elif(93 <= average_array[i] < 95 or 103 <= average_array[i] <= 105):
+                confidence_values.append(0.5)
+            else:
+                confidence_values.append(0)
+        if(conf_one > 5):
+            confidence_values.append(1)
+        elif(2 < conf_one <= 5):
+            confidence_values.append(0.5)
+        else:
+            confidence_values.append(0)
+        
+        if(conf_two > 5):
+            confidence_values.append(1)
+        elif(2 < conf_two <= 5):
+            confidence_values.append(0.5)
+        else:
+            confidence_values.append(0)
+        
+        return confidence_values
+
+    def classify(self, confidence_values):
+        percentile = 100*(sum(confidence_values)/len(confidence_values))
+
+        print("Confidence of transit: ", "{:.2f}".format(percentile) + "%")
+        if(percentile < 45):
+            print("Less than half of the checks have passed, Transit not probable.")
+        elif(45 <= percentile  <= 70):
+            print("Check percentages fall within a middle range, Tranist possible but direct examination required.")
+        else:
+            print("Majority of checks passed, Transit highly probable.")
+        return
 
 
 if __name__ == '__main__':
@@ -154,8 +192,11 @@ if __name__ == '__main__':
                     y=l.X['depth'] * -1, hue=l.X['labels_desc'])
     # plt.title(cluster_name)
     plt.show()
-
-    print("Transit: ", l.average())
+    avg = l.average()
+    conf = l.confidence(avg)
+    print("Transit: ", avg)
+    print(conf)
+    l.classify(conf)
     
     # l2 = Labeler(pd.read_csv('test/no_transit.csv'))
     # l2.get_data()
