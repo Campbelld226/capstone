@@ -15,7 +15,10 @@ class Labeler:
         self.X = X
         self.n_clusters = 5
     
-    def cluster_method(self, X, val):
+    def cluster_method(self, val):
+        # MaxMin Scaling between 0->1
+        norm = MinMaxScaler()
+        X = norm.fit(self.X).transform(self.X)
 
         if val == 1:
             # Applying Unsupervised Learning for Labels
@@ -27,15 +30,18 @@ class Labeler:
         elif val == 3:
             clustering = KMeans(n_clusters=self.n_clusters).fit(X)
 
+        # Dropping nans from features
+        mask = ~self.X.isna()
+        mask = mask.all(axis=1)
+        if clustering.labels_.shape[0] != self.X.shape[0]:
+            self.X = self.X.loc[mask]
+            clustering.labels_ = clustering.labels_[mask]
+            clustering.labels_ = clustering.labels_[mask]
+
         return clustering
 
-    def display(self, mask, X, clustering, cluster_name, train_data):
-        # Dropping nans from features
-        if clustering.labels_.shape[0] != train_data.shape[0]:
-            train_data = train_data.loc[mask]
-            clustering.labels_ = clustering.labels_[mask]
-            clustering.labels_ = clustering.labels_[mask]
-
+    def order_clusters(self, clustering):
+        train_data = self.X
         color_array = ['red', 'blue', 'green', 'yellow', 'gray']
         labels_desc_array = ['Exterior Ingress', 'Interior Ingress', 'Greatest Transit', 'Interior Egress', 'Exterior Egress']
         cluster_dict = {}
@@ -43,6 +49,7 @@ class Labeler:
         labels_int = []
         color = []
         labels_desc = []
+
         for index, label in enumerate(clustering.labels_):
             if label not in cluster_dict.keys():
                 cluster_num = cluster_num + 1
@@ -55,36 +62,9 @@ class Labeler:
         train_data['labels_int'] = labels_int
         train_data['labels_desc'] = labels_desc
         train_data['color'] = color
+        self.X = train_data
 
 
-        # # Settings Labels as color
-        # train_data['labels_int'] = clustering.labels_
-        # print(clustering.labels_)
-        # #print(train_data['labels_int'])
-        # #print(train_data['labels_int'])
-        # color_map = {'0': 'red',
-        #             '1': 'blue',
-        #             '2': 'green',
-        #             '3': 'gray',
-        #             '4': 'yellow',
-        #             '5': 'purple'}
-        # train_data['color'] = train_data.apply(lambda x: color_map[str(int(x['labels_int']))], axis=1)
-        #
-        # # Create Readable Labels
-        # label_map = {'0': 'Bottom',
-        #            '1': 'Upward Slope',
-        #            '2': 'Post Transit',
-        #            '3': 'Downward Slope',
-        #           '4': 'Pre Transit',
-        #           '5': 'Other'}
-        # train_data['labels_desc'] = train_data.apply(lambda x: label_map[str(int(x['labels_int']))], axis=1)
-
-        sns.scatterplot(x=range(len(train_data['depth'])),
-                        y=train_data['depth'] * -1, hue=train_data['labels_desc'])
-        plt.title(cluster_name)
-
-        plt.show()
-        return train_data
 
     def get_data(self):
         train_data = self.X
@@ -116,20 +96,14 @@ class Labeler:
         mask = ~train_data.isna()
         mask = mask.all(axis=1)
         train_data = train_data.loc[mask]
-
-        # MaxMin Scaling between 0->1
-        X = train_data
-        norm = MinMaxScaler()
-        X = norm.fit(X).transform(X)
-
-        agglom_clustering = self.cluster_method(X, 1)
-        spectral_clustering = self.cluster_method(X, 2)
-        k_means = self.cluster_method(X, 3)
-        train_data = self.display(mask, X, agglom_clustering, "Agglomerative Clustering", train_data)
-        train_data = self.display(mask, X, spectral_clustering, "Spectral Clustering", train_data)
-        train_data = self.display(mask, X, k_means, "K-Means Clustering", train_data)
         self.X = train_data
-        return train_data
+
+        # agglom_clustering = self.cluster_method(1)
+        # spectral_clustering = self.cluster_method(2)
+        # k_means = self.cluster_method(3)
+        # train_data = self.display(mask, agglom_clustering, "Agglomerative Clustering")
+        # train_data = self.display(mask, spectral_clustering, "Spectral Clustering")
+        # train_data = self.display(mask, k_means, "K-Means Clustering")
 
     def average(self):
         train_data = self.X
@@ -158,17 +132,46 @@ class Labeler:
         #all_avg.append(total)
 
 
-
-
-
-
-
-
 if __name__ == '__main__':
     l = Labeler(pd.read_csv('test/CoRoT-2b_1.2.csv'))
     l.get_data()
+    agglom_clustering = l.cluster_method(1)
+    spectral_clustering = l.cluster_method(2)
+    k_means = l.cluster_method(3)
+
+    l.order_clusters(agglom_clustering)
+    sns.scatterplot(x=range(len(l.X['depth'])),
+                    y=l.X['depth'] * -1, hue=l.X['labels_desc'])
+    # plt.title(cluster_name)
+    plt.show()
+    l.order_clusters(spectral_clustering)
+    sns.scatterplot(x=range(len(l.X['depth'])),
+                    y=l.X['depth'] * -1, hue=l.X['labels_desc'])
+    # plt.title(cluster_name)
+    plt.show()
+    l.order_clusters(k_means)
+    sns.scatterplot(x=range(len(l.X['depth'])),
+                    y=l.X['depth'] * -1, hue=l.X['labels_desc'])
+    # plt.title(cluster_name)
+    plt.show()
+
     print("Transit: ", l.average())
     
-    l2 = Labeler(pd.read_csv('test/no_transit.csv'))
-    l2.get_data()
-    print("No Transit: ", l2.average())
+    # l2 = Labeler(pd.read_csv('test/no_transit.csv'))
+    # l2.get_data()
+    # print("No Transit: ", l2.average())
+
+
+# Create fake data
+# import decimal
+# time_array = []
+# depth_array = []
+# val = decimal.Decimal(2458000.0)
+# while val < 2458000.2:
+#     time_array.append(float(val))
+#     depth_array.append(round(random.uniform(-0.001, 0.001), 6))
+#     val += decimal.Decimal(0.001)
+# test = pd.DataFrame({'epoch': time_array, 'depth': depth_array})
+# test['epoch'] = time_array
+# test['depth'] = depth_array
+# test.to_csv()
