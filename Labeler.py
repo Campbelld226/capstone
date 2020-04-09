@@ -112,8 +112,9 @@ class Labeler:
         cluster2 = []
         cluster3 = []
         cluster4 = []
-        total = mean(train_data['depth'])
-        for index, label in enumerate(train_data['depth']):
+        total = mean(train_data['depth_prop'])
+        # print("Overall Avg:", total*100)
+        for index, label in enumerate(train_data['depth_prop']):
             if list(train_data['labels_int'])[index] == 0:
                 cluster0.append(label)
             elif list(train_data['labels_int'])[index] == 1:
@@ -123,8 +124,12 @@ class Labeler:
             elif list(train_data['labels_int'])[index] == 3:
                 cluster3.append(label)
             elif list(train_data['labels_int'])[index] == 4:
-                cluster4.append(label) 
-        
+                cluster4.append(label)
+        # print("Cluster 0 avg:", mean(cluster0)*100)
+        # print("Cluster 1 avg:", mean(cluster1)*100)
+        # print("Cluster 2 avg:", mean(cluster2)*100)
+        # print("Cluster 3 avg:", mean(cluster3)*100)
+        # print("Cluster 4 avg:", mean(cluster4)*100)
         overall_avg = [(mean(cluster0)/total)*100, (mean(cluster1)/total)*100,
                     (mean(cluster2)/total)*100, (mean(cluster3)/total)*100,
                     (mean(cluster4)/total)*100]
@@ -132,39 +137,87 @@ class Labeler:
         
     def confidence(self, average_array):
         confidence_values = []
-        conf_one = abs(average_array[1] - average_array[0])
-        conf_two = abs(average_array[3] - average_array[4])
+        conf_one = abs(average_array[2] - average_array[0])
+        conf_two = abs(average_array[2] - average_array[4])
+        conf_three = abs(average_array[2] - average_array[1])
+        conf_four = abs(average_array[2] - average_array[3])
+        conf_five = abs(average_array[1] - average_array[3])
+
+        # Check averages of each individual cluster
         for i in range(len(average_array)):
-            if(average_array[i] <= 95 or average_array[i] >= 105):
-                confidence_values.append(1)
-            elif(93 <= average_array[i] < 95 or 103 <= average_array[i] <= 105):
-                confidence_values.append(0.5)
+            if i == 1 or i == 3:
+                if (average_array[i] <= 97) or (average_array[i] >= 103):
+                    confidence_values.append(0)
+                elif (99 >= average_array[i] > 97) or (101 <= average_array[i] < 103):
+                    confidence_values.append(0.5)
+                else:
+                    confidence_values.append(1)
             else:
-                confidence_values.append(0)
-        if(conf_one > 5):
+                if(average_array[i] <= 97) or (average_array[i] >= 103):
+                    confidence_values.append(1)
+                elif(99 >= average_array[i] > 97) or (101 <= average_array[i] < 103):
+                    confidence_values.append(0.5)
+                else:
+                    confidence_values.append(0)
+
+        # Pre-transit avg - bottom avg
+        if conf_one > 5:
             confidence_values.append(1)
-        elif(2 < conf_one <= 5):
+        elif 2 < conf_one <= 5:
             confidence_values.append(0.5)
         else:
             confidence_values.append(0)
-        
-        if(conf_two > 5):
+
+        # Post-transit avg - bottom avg
+        if conf_two > 5:
             confidence_values.append(1)
-        elif(2 < conf_two <= 5):
+        elif 2 < conf_two <= 5:
             confidence_values.append(0.5)
         else:
             confidence_values.append(0)
+
+        # Bottom avg - downwards slope avg
+        if conf_three > 5:
+            confidence_values.append(1)
+        elif 2 < conf_three <= 5:
+            confidence_values.append(0.5)
+        else:
+            confidence_values.append(0)
+
+        # Bottom avg - upwards slope avg
+        if conf_four > 5:
+            confidence_values.append(1)
+        elif 2 < conf_four <= 5:
+            confidence_values.append(0.5)
+        else:
+            confidence_values.append(0)
+
+        # Downwards slope avg - upwards slope avg
+        if conf_five > 5:
+            confidence_values.append(0)
+        elif 2 < conf_five <= 5:
+            confidence_values.append(0.5)
+        else:
+            confidence_values.append(1)
         
         return confidence_values
 
-    def classify(self, confidence_values):
-        percentile = 100*(sum(confidence_values)/len(confidence_values))
+    def classify(self):
+        avg = self.average()
+        # print("Transit Averages:", avg)
+        confidence_values = self.confidence(avg)
+        # print(confidence_values)
+        #percentile = 100 * (sum(confidence_values) / len(confidence_values))
+        percentile = sum(confidence_values[:5]*15) + sum(confidence_values[5:]*5)
+        #print(percentile)
 
         print("Confidence of transit: ", "{:.2f}".format(percentile) + "%")
-        if(percentile < 45):
+        if percentile < 50:
             print("Less than half of the checks have passed, Transit not probable.")
-        elif(45 <= percentile  <= 70):
-            print("Check percentages fall within a middle range, Tranist possible but direct examination required.")
+        elif 50 <= percentile < 75:
+            print("Checks passed fall within a lower range, transit possible but more analysis required.")
+        elif 75 <= percentile < 90:
+            print("Checks passed fall within a middle range, transit probable but direct examination required.")
         else:
             print("Majority of checks passed, Transit highly probable.")
         return
@@ -192,13 +245,13 @@ if __name__ == '__main__':
                     y=l.X['depth'] * -1, hue=l.X['labels_desc'])
     # plt.title(cluster_name)
     plt.show()
-    avg = l.average()
-    conf = l.confidence(avg)
-    print("Transit: ", avg)
-    print(conf)
-    l.classify(conf)
+    #avg = l.average()
+    #conf = l.confidence(avg)
+    #print("Transit: ", avg)
+    #print(conf)
+    l.classify()
     
-    # l2 = Labeler(pd.read_csv('test/no_transit.csv'))
+    # l2 = Labeler(pd.read_csv('test/weak_transit.csv'))
     # l2.get_data()
     # print("No Transit: ", l2.average())
 
@@ -216,3 +269,6 @@ if __name__ == '__main__':
 # test['epoch'] = time_array
 # test['depth'] = depth_array
 # test.to_csv()
+
+
+
